@@ -1,80 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Runtime.Intrinsics.X86;
-using System.Text.RegularExpressions;
+﻿using erwachen.Alias;
+using JetBrains.Annotations;
+using Spectre.Console.Cli;
 
 namespace erwachen
 {
-    internal partial class Program
+    [UsedImplicitly]
+    internal class Program
     {
-        #region Constants and Global Variables
-        
-            private static readonly Regex[] HardwareAddressRegex = new Regex[]
-            {
-                CanonicalHardwareAddress(),
-                WindowsHardwareAddress(),
-                HewlettPackardSwitchAddress(),
-                IntelLandeskAddress()
-            };
+        private const string Version = "0.1.0";
 
-            private const string DefaultIp = "255.255.255.255";
-            private const int DefaultPort = 9;
-            
-        #endregion
-        
-        private static void Main(string[] args)
+        private static int Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            CommandApp erwachen = new();
+            
+            erwachen.Configure(config =>
+            {
+                config.SetApplicationName("erwachen");
+                config.SetApplicationVersion(Version);
+
+                config.AddBranch("alias", alias =>
+                {
+                    alias.AddCommand<AddAliasCommand>("add")
+                        .WithDescription("Add a new hardware address alias")
+                        .WithExample("alias add", "<alias>", "<hardwareAddress>");
+
+                    alias.AddCommand<RemoveAliasCommand>("remove")
+                        .WithDescription("Remove a hardware address alias")
+                        .WithExample("alias remove", "<alias>");
+                    
+                    alias.AddCommand<ListAliasCommand>("list")
+                        .WithDescription("List all available hardware address aliases")
+                        .WithExample("alias list");
+                });
+            });
+            
+            return erwachen.Run(args);
         }
-
-        #region Helper Functions
-
-            private static bool IsValidIpAddress(string ip)
-            {
-                if (string.IsNullOrWhiteSpace(ip))
-                    return false;
-
-                try
-                {
-                    IPAddress.Parse(ip);
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-
-            private static bool IsValidPort(int port) => port >= 0 && port <= 65535;
-
-            private static bool IsValidHardwareAddress(string hardwareAddress)
-            {
-                if (string.IsNullOrWhiteSpace(hardwareAddress))
-                    return false;
-
-                foreach (var re in HardwareAddressRegex)
-                {
-                    if (re.IsMatch(hardwareAddress))
-                        return true;
-                }
-                return false;
-            }
-
-        #endregion
-
-        #region Regex Functions
-
-            [GeneratedRegex(@"^(?:[\da-f]{1,2}:){5}[\da-f]{1,2}$", RegexOptions.IgnoreCase)]
-            private static partial Regex CanonicalHardwareAddress();
-            [GeneratedRegex(@"^(?:[\da-f]{1,2}-){5}[\da-f]{1,2}$", RegexOptions.IgnoreCase)]
-            private static partial Regex WindowsHardwareAddress();
-            [GeneratedRegex(@"^[\da-f]{6}-[\da-f]{6}$", RegexOptions.IgnoreCase)]
-            private static partial Regex HewlettPackardSwitchAddress();
-            [GeneratedRegex(@"^[\da-f]{12}$", RegexOptions.IgnoreCase)]
-            private static partial Regex IntelLandeskAddress();        
-
-        #endregion
-
     }
 }
