@@ -49,10 +49,11 @@ jobs:
           path: artifacts
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2.2.2
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           files: artifacts/**/release-*.zip
+          make_latest: "True"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
