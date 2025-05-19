@@ -21,7 +21,7 @@ A step by step series of examples that tell you how to build erwachen
 
 Clone the git repository
 
-    git clone url
+    git clone https://github.com/Protract-123/erwachen.git
 
 Access the cloned directory
 
@@ -58,4 +58,4 @@ details
 
 ## Acknowledgments
 
-- [jpoliv](https://github.com/jpoliv) - Made [wakeonlan](https://github.com/jpoliv/wakeonlan)
+- [jpoliv](https://github.com/jpoliv) - Made [wakeonlan](https://github.com/jpoliv/wakeonlan), which inspired this project
