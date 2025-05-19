@@ -28,7 +28,7 @@ jobs:
 
       - name: Publish for ${{ matrix.rid }}
         run: |
-          dotnet publish -c $CONFIGURATION -r ${{ matrix.rid }} --self-contained true -o publish
+          dotnet publish -c $CONFIGURATION -r ${{ matrix.rid }} --self-contained true --publish-single-file true -o publish
           cd publish
           zip -r ../release-${{ matrix.rid }}.zip .
           cd ..
