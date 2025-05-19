@@ -34,7 +34,9 @@ Then access the directory with the .csproj file (yes it's the same directory nam
 Given that .NET is installed, you can run the following to build for your platform. Some common platforms are win-x64, osx-x64 and linux-x64. 
 A list of all platforms can be found [here](https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.NETCore.Platforms/src/PortableRuntimeIdentifierGraph.json)
     
-    dotnet publish -c Release -r [platform] --self-contained true
+    dotnet publish -c Release -r [platform] -p:PublishSingleFile=true --self-contained true
+
+To use the erwachen cli anywhere, you need to add the directory to the generated erwachen binary to your path. A quick google search should tell you how to do this
 
 ## The CLI
 
