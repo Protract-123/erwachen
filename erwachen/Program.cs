@@ -32,6 +32,10 @@ namespace erwachen
                         .WithDescription("List all available hardware address aliases")
                         .WithExample("alias list");
                 });
+
+                config.AddCommand<WakeCommand>("wake")
+                    .WithDescription("Wake a hardware address with alias or arbitrary address")
+                    .WithExample("wake", "[alias]", "-h 00:00:00:00:00:00", "-i 192.168.1.1", "-p 10");
             });
             
             return erwachen.Run(args);
