@@ -1,4 +1,4 @@
-﻿using Spectre.Console.Cli;
+﻿using System;
 
 namespace erwachen;
     internal static class Program
@@ -7,14 +7,8 @@ namespace erwachen;
 
         private static int Main(string[] args)
         {
-            CommandApp erwachen = new();
-            
-            erwachen.Configure(config =>
-            {
-                config.SetApplicationName("erwachen");
-                config.SetApplicationVersion(Version);
-            });
-            
-            return erwachen.Run(args);
+            Core.Wake.SendMagicPacket("ABC123ABC123", "255.255.255.255", 9);
+            Console.Write("Woke up the (definitely not hardcoded) device!!");
+            return 0;
         }
     }

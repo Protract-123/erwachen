@@ -10,9 +10,7 @@ public sealed record Alias(string Name, string MacAddress);
 
 public static class AliasManager
 {
-    private static readonly string AliasConfigPath = Path.Combine(AppPaths.ConfigDirectory, "aliasList.toml");
     private static readonly TomlSerializerOptions SerializerOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
 
     public static void AddAlias(Alias alias)
     {
@@ -58,16 +56,16 @@ public static class AliasManager
 
     private static List<Alias> ReadAliases()
     {
-        if (!File.Exists(AliasConfigPath))
+        if (!File.Exists(AppPaths.AliasConfigPath))
             return [];
 
-        string toml = File.ReadAllText(AliasConfigPath);
+        string toml = File.ReadAllText(AppPaths.AliasConfigPath);
         return TomlSerializer.Deserialize<List<Alias>>(toml, SerializerOptions) ?? [];
     }
 
     private static void WriteAliases(List<Alias> aliases)
     {
         string toml = TomlSerializer.Serialize(aliases, SerializerOptions);
-        File.WriteAllText(AliasConfigPath, toml);
+        File.WriteAllText(AppPaths.AliasConfigPath, toml);
     }
 }
