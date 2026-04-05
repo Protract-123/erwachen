@@ -6,8 +6,8 @@ namespace erwachen.Core;
 public static class AppPaths
 {
     private static readonly string ConfigDirectory;
-    internal static readonly string AliasConfigPath;
-    
+    public static readonly string AliasesPath;
+
     static AppPaths()
     {
         string configDir = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME")
@@ -16,6 +16,6 @@ public static class AppPaths
         ConfigDirectory = Path.Combine(configDir, "erwachen");
         Directory.CreateDirectory(ConfigDirectory);
 
-        AliasConfigPath = Path.Combine(ConfigDirectory, "aliasList.toml");
+        AliasesPath = Path.Combine(ConfigDirectory, "aliases.toml");
     }
 }

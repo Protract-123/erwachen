@@ -1,6 +1,9 @@
 # Jetbrains files
 /.idea
 
+# Mac info file
+.DS_Store
+
 ## Below is copied from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 # User-specific files
