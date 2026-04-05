@@ -12,7 +12,7 @@ public static class Wake
         if (!FormatCheckers.IsValidIpAddress(ip)) throw new ArgumentException("Invalid IP address");
         if (!FormatCheckers.IsValidPort(port)) throw new ArgumentException("Invalid port number");
         if (!FormatCheckers.IsValidHardwareAddress(macAddress)) throw new ArgumentException("Invalid MAC address");
-        
+
         byte[] magicPacket = GenerateMagicPacket(macAddress);
 
         using UdpClient udpClient = new();
@@ -29,9 +29,10 @@ public static class Wake
 
         packet.AsSpan(0, 6).Fill(0xFF);
         for (int i = 0; i < 16; i++) macBytes.CopyTo(packet, 6 + i * 6);
-        
+
         return packet;
     }
 
-    private static string ExtractHardwareAddress(string hardwareAddress) => new (hardwareAddress.Where(Uri.IsHexDigit).ToArray());
+    private static string ExtractHardwareAddress(string hardwareAddress) =>
+        new(hardwareAddress.Where(Uri.IsHexDigit).ToArray());
 }

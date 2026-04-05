@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using Tomlyn;
+using Tomlyn.Model;
 
 namespace erwachen.Core;
 
@@ -10,7 +12,8 @@ public sealed record Alias(string Name, string MacAddress);
 
 public static class AliasManager
 {
-    private static readonly TomlSerializerOptions SerializerOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    private static readonly TomlSerializerOptions SerializerOptions = new()
+        { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     public static void AddAlias(Alias alias)
     {
@@ -60,12 +63,34 @@ public static class AliasManager
             return [];
 
         string toml = File.ReadAllText(AppPaths.AliasConfigPath);
-        return TomlSerializer.Deserialize<List<Alias>>(toml, SerializerOptions) ?? [];
+        TomlTable doc = TomlSerializer.Deserialize<TomlTable>(toml)!;
+
+        if (!doc.TryGetValue("aliases", out object value) || value is not TomlTableArray tableArray)
+            return [];
+
+        return tableArray
+            .Select(t => new Alias((string)t["name"], (string)t["macAddress"]))
+            .ToList();    
     }
 
     private static void WriteAliases(List<Alias> aliases)
     {
-        string toml = TomlSerializer.Serialize(aliases, SerializerOptions);
+        TomlTable doc = new();
+        TomlTableArray tableArray = [];
+
+        foreach (Alias alias in aliases)
+        {
+            TomlTable table = new()
+            {
+                ["name"] = alias.Name,
+                ["macAddress"] = alias.MacAddress
+            };
+            tableArray.Add(table);
+        }
+
+        doc["aliases"] = tableArray;
+
+        string toml = TomlSerializer.Serialize(doc, SerializerOptions);
         File.WriteAllText(AppPaths.AliasConfigPath, toml);
     }
 }
