@@ -91,16 +91,23 @@ public static class InteractiveShell
         List<Alias> aliases = AliasManager.GetAllAliases();
         Alias manualSentinel = new("__manual__", "");
 
-        List<Alias> aliasChoices = [..aliases, manualSentinel];
+        Alias selectedAlias;
 
-        AnsiConsole.MarkupLine("[fuchsia]Which device would you like to wake?[/]");
-        Alias selectedAlias = AnsiConsole.Prompt(new SelectionPrompt<Alias>()
-            .HighlightStyle(new Style(foreground: Color.Fuchsia, decoration: Decoration.Bold))
-            .UseConverter(alias => ReferenceEquals(alias, manualSentinel)
-                ? "[grey]- Enter MAC manually -[/]"
-                : $"{alias.Name} [grey]{alias.MacAddress}[/]")
-            .AddChoices(aliasChoices)
-            .WrapAround());
+        if (aliases.Count > 0)
+        {
+            List<Alias> aliasChoices = [..aliases, manualSentinel];
+
+            AnsiConsole.MarkupLine("[fuchsia]Which device would you like to wake?[/]");
+            selectedAlias = AnsiConsole.Prompt(new SelectionPrompt<Alias>()
+                .HighlightStyle(new Style(foreground: Color.Fuchsia, decoration: Decoration.Bold))
+                .UseConverter(alias => ReferenceEquals(alias, manualSentinel)
+                    ? "[grey]- Enter MAC manually -[/]"
+                    : $"{alias.Name} [grey]{alias.MacAddress}[/]")
+                .AddChoices(aliasChoices)
+                .WrapAround());
+        }
+        else selectedAlias = manualSentinel;
+
 
         string deviceName;
         string macAddress;
@@ -183,12 +190,19 @@ public static class InteractiveShell
             return;
         }
 
-        AnsiConsole.MarkupLine("[fuchsia]Which device would you like to remove?[/]");
-        Alias selectedAlias = AnsiConsole.Prompt(new SelectionPrompt<Alias>()
-            .HighlightStyle(new Style(foreground: Color.Fuchsia, decoration: Decoration.Bold))
-            .UseConverter(alias => $"{alias.Name} [grey]{alias.MacAddress}[/]")
-            .AddChoices(aliases)
-            .WrapAround());
+        Alias selectedAlias;
+
+        if (aliases.Count > 1)
+        {
+            AnsiConsole.MarkupLine("[fuchsia]Which device would you like to remove?[/]");
+            selectedAlias = AnsiConsole.Prompt(new SelectionPrompt<Alias>()
+                .HighlightStyle(new Style(foreground: Color.Fuchsia, decoration: Decoration.Bold))
+                .UseConverter(alias => $"{alias.Name} [grey]{alias.MacAddress}[/]")
+                .AddChoices(aliases)
+                .WrapAround());
+        }
+        else selectedAlias = aliases[0];
+
 
         Table detailsTable = new Table()
             .HideHeaders()
