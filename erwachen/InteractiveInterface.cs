@@ -5,7 +5,7 @@ using Spectre.Console;
 
 namespace erwachen;
 
-public static class InteractiveShell
+public static class InteractiveInterface
 {
     private sealed record Action(string Key, string Label, string Description);
 
@@ -23,7 +23,7 @@ public static class InteractiveShell
     private const string BroadcastAddress = "255.255.255.255";
     private const int WakeOnLanPort = 9;
 
-    public static void RunInteractive()
+    public static int Run()
     {
         while (true)
         {
@@ -32,15 +32,15 @@ public static class InteractiveShell
 
             AnsiConsole.MarkupLine("[fuchsia]What would you like to do?[/]");
             Action selectedAction = AnsiConsole.Prompt(new SelectionPrompt<Action>()
-                .WrapAround()
                 .HighlightStyle(new Style(foreground: Color.Fuchsia, decoration: Decoration.Bold))
                 .UseConverter(action => $"{action.Label} [grey]- {action.Description}[/]")
-                .AddChoices(ActionList));
+                .AddChoices(ActionList)
+                .WrapAround());
 
             if (selectedAction.Key == "exit")
             {
                 AnsiConsole.MarkupLine("Goodbye.");
-                return;
+                return 0;
             }
 
             AnsiConsole.Clear();
@@ -54,7 +54,7 @@ public static class InteractiveShell
             }
             catch (Exception exception)
             {
-                AnsiConsole.MarkupLine($"[red]{Markup.Escape(exception.Message)}[/]");
+                AnsiConsole.MarkupLine($"[bold red]{Markup.Escape(exception.Message)}[/]");
             }
 
             AnsiConsole.WriteLine();
@@ -107,7 +107,6 @@ public static class InteractiveShell
                 .WrapAround());
         }
         else selectedAlias = manualSentinel;
-
 
         string deviceName;
         string macAddress;
@@ -202,7 +201,6 @@ public static class InteractiveShell
                 .WrapAround());
         }
         else selectedAlias = aliases[0];
-
 
         Table detailsTable = new Table()
             .HideHeaders()

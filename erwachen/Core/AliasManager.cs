@@ -19,7 +19,7 @@ public static class AliasManager
         List<Alias> aliases = ReadAliases();
 
         if (aliases.Exists(existingAlias => existingAlias.Name == alias.Name))
-            throw new InvalidOperationException("An alias with this name already exists");
+            throw new InvalidOperationException("A device with this name already exists");
 
         aliases.Add(alias);
         WriteAliases(aliases);
@@ -48,7 +48,7 @@ public static class AliasManager
         int index = aliases.FindIndex(alias => alias.Name == aliasName);
 
         if (index == -1)
-            throw new InvalidOperationException($"No alias found with name '{aliasName}'");
+            throw new InvalidOperationException($"No device found with name '{aliasName}'");
 
         aliases.RemoveAt(index);
         WriteAliases(aliases);

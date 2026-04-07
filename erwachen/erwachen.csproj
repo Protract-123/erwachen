@@ -24,7 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="CLI\" />
       <Folder Include="GUI\" />
     </ItemGroup>
 
