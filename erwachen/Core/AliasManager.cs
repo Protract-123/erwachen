@@ -25,21 +25,22 @@ public static class AliasManager
         WriteAliases(aliases);
     }
 
-    public static string GetMacFromAlias(string aliasName)
+    public static bool TryGetMacFromAlias(string aliasName, out string macAddress)
     {
         List<Alias> aliases = ReadAliases();
         Alias? match = aliases.Find(alias => alias.Name == aliasName);
 
         if (match is null)
-            throw new InvalidOperationException($"No alias found with name '{aliasName}'");
+        {
+            macAddress = string.Empty;
+            return false;
+        }
 
-        return match.MacAddress;
+        macAddress = match.MacAddress;
+        return true;
     }
 
-    public static List<Alias> GetAllAliases()
-    {
-        return ReadAliases();
-    }
+    public static List<Alias> GetAllAliases() => ReadAliases();
 
     public static void RemoveAlias(string aliasName)
     {

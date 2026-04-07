@@ -9,9 +9,14 @@ public static class Wake
 {
     public static void SendMagicPacket(string macAddress, string ipAddress, int port)
     {
-        if (!FormatCheckers.IsValidIpAddress(ipAddress)) throw new ArgumentException("Invalid IP address");
-        if (!FormatCheckers.IsValidPort(port)) throw new ArgumentException("Invalid port number");
-        if (!FormatCheckers.IsValidMacAddress(macAddress)) throw new ArgumentException("Invalid MAC address");
+        if (!FormatCheckers.IsValidIpAddress(ipAddress))
+            throw new ArgumentException("Invalid IP address");
+
+        if (!FormatCheckers.IsValidPort(port))
+            throw new ArgumentException("Invalid port number");
+
+        if (!FormatCheckers.IsValidMacAddress(macAddress))
+            throw new ArgumentException("Invalid MAC address");
 
         byte[] magicPacket = GenerateMagicPacket(macAddress);
 
@@ -24,14 +29,15 @@ public static class Wake
 
     private static byte[] GenerateMagicPacket(string macAddress)
     {
-        byte[] macBytes = Convert.FromHexString(ExtractMacAddress(macAddress));
-        byte[] packet = new byte[6 + 16 * 6];
+        // Magic Packet format is 6 * 0xFF + 16 * macAddress
+        byte[] magicPacket = new byte[6 + 16 * 6];
+        byte[] macAddressBytes = Convert.FromHexString(ExtractMacAddress(macAddress));
 
-        packet.AsSpan(0, 6).Fill(0xFF);
-        for (int repetitionIndex = 0; repetitionIndex < 16; repetitionIndex++)
-            macBytes.CopyTo(packet, 6 + repetitionIndex * 6);
+        magicPacket.AsSpan(0, 6).Fill(0xFF);
+        for (int i = 0; i < 16; i++)
+            macAddressBytes.CopyTo(magicPacket, 6 + i * 6);
 
-        return packet;
+        return magicPacket;
     }
 
     private static string ExtractMacAddress(string macAddress) =>
