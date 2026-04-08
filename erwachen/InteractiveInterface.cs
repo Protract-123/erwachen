@@ -15,11 +15,11 @@ public static class InteractiveInterface
         new("add", "Add a device", "Register a new device"),
         new("remove", "Remove a device", "Remove a registered device"),
         new("list", "List devices", "Show all registered devices"),
-        new("exit", "Exit", "Leave the shell"),
+        new("exit", "Exit", "Leave the interactive menu"),
     ];
 
     private static readonly FigletFont FigletFont = FigletFont.Load(ThisAssembly.Resources.Assets.Terminus.GetStream());
-    private const int FigletCharWidth = 6;
+
     private const string BroadcastAddress = "255.255.255.255";
     private const int WakeOnLanPort = 9;
 
@@ -30,7 +30,9 @@ public static class InteractiveInterface
             AnsiConsole.Clear();
             RenderBanner();
 
-            AnsiConsole.MarkupLine("[fuchsia]What would you like to do?[/]");
+            AnsiConsole.Write(new Rule($"[fuchsia]Pick an action[/]").LeftJustified().RuleStyle("grey"));
+            AnsiConsole.WriteLine();
+
             Action selectedAction = AnsiConsole.Prompt(new SelectionPrompt<Action>()
                 .HighlightStyle(new Style(foreground: Color.Fuchsia, decoration: Decoration.Bold))
                 .UseConverter(action => $"{action.Label} [grey]- {action.Description}[/]")
@@ -65,13 +67,9 @@ public static class InteractiveInterface
 
     private static void RenderBanner()
     {
-        const string title = "erwachen";
-        AnsiConsole.Write(new FigletText(FigletFont, title).LeftJustified().Color(Color.Fuchsia));
-
-        const string subtitle = $"Wake-on-LAN for humans · v{Program.Version}";
-        int bannerWidth = title.Length * FigletCharWidth;
-        int padding = Math.Max(0, (bannerWidth - subtitle.Length) / 2);
-        AnsiConsole.MarkupLine(new string(' ', padding) + subtitle);
+        AnsiConsole.Write(new FigletText(FigletFont, "erwachen").Centered().Color(Color.Fuchsia));
+        AnsiConsole.Write(new Text($"Wake-on-LAN for humans · v{Program.Version}").Centered());
+        AnsiConsole.WriteLine();
         AnsiConsole.WriteLine();
     }
 
@@ -97,7 +95,6 @@ public static class InteractiveInterface
         {
             List<Alias> aliasChoices = [..aliases, manualSentinel];
 
-            AnsiConsole.MarkupLine("[fuchsia]Which device would you like to wake?[/]");
             selectedAlias = AnsiConsole.Prompt(new SelectionPrompt<Alias>()
                 .HighlightStyle(new Style(foreground: Color.Fuchsia, decoration: Decoration.Bold))
                 .UseConverter(alias => ReferenceEquals(alias, manualSentinel)
@@ -165,6 +162,7 @@ public static class InteractiveInterface
             .AddRow("[bold]Name[/]", $"[cyan]{Markup.Escape(aliasName)}[/]")
             .AddRow("[bold]MAC[/]", $"[yellow]{Markup.Escape(macAddress)}[/]");
 
+        AnsiConsole.WriteLine();
         AnsiConsole.Write(detailsTable);
         AnsiConsole.WriteLine();
 
@@ -193,7 +191,6 @@ public static class InteractiveInterface
 
         if (aliases.Count > 1)
         {
-            AnsiConsole.MarkupLine("[fuchsia]Which device would you like to remove?[/]");
             selectedAlias = AnsiConsole.Prompt(new SelectionPrompt<Alias>()
                 .HighlightStyle(new Style(foreground: Color.Fuchsia, decoration: Decoration.Bold))
                 .UseConverter(alias => $"{alias.Name} [grey]{alias.MacAddress}[/]")
@@ -234,7 +231,6 @@ public static class InteractiveInterface
         }
 
         Table devicesTable = new Table()
-            .Title("[fuchsia]Registered Devices[/]")
             .RoundedBorder()
             .AddColumn(new TableColumn("[bold]#[/]").RightAligned())
             .AddColumn(new TableColumn("[bold]Name[/]"))

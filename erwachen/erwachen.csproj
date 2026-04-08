@@ -23,8 +23,4 @@
         <EmbeddedResource Include="Assets\Terminus.flf" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="GUI\" />
-    </ItemGroup>
-
 </Project>
