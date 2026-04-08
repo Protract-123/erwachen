@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rid: [win-x64, win-arm64, linux-x64, linux-arm64, osx-x64, osx-arm64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish
+        run: dotnet publish -c Release -r ${{ matrix.rid }} --self-contained true -o publish
+
+      - name: Determine binary name
+        id: bin
+        run: |
+          if [[ "${{ matrix.rid }}" == win-* ]]; then
+            echo "name=erwachen.exe" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=erwachen" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Zip release artifact
+        run: zip -j release-${{ matrix.rid }}.zip publish/${{ steps.bin.outputs.name }}
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.rid }}
+          path: publish/${{ steps.bin.outputs.name }}
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.rid }}
+          path: release-${{ matrix.rid }}.zip

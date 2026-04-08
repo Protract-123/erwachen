@@ -1,0 +1,109 @@
+name: Test
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rid: linux-x64
+            bin: erwachen
+          - os: ubuntu-24.04-arm
+            rid: linux-arm64
+            bin: erwachen
+
+          - os: macos-15-intel
+            rid: osx-x64
+            bin: erwachen
+          - os: macos-15
+            rid: osx-arm64
+            bin: erwachen
+
+          - os: windows-latest
+            rid: win-x64
+            bin: erwachen.exe
+          - os: windows-11-arm
+            rid: win-arm64
+            bin: erwachen.exe
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Download binary
+        uses: actions/download-artifact@v4
+        with:
+          name: binary-${{ matrix.rid }}
+          path: ./bin
+
+      - name: Make executable
+        if: runner.os != 'Windows'
+        run: chmod +x ./bin/${{ matrix.bin }}
+
+      - name: Test --help
+        run: ./bin/${{ matrix.bin }} --help
+
+      - name: Test --version
+        run: ./bin/${{ matrix.bin }} --version
+
+      - name: Test device add
+        run: ./bin/${{ matrix.bin }} device add testdevice AA:BB:CC:DD:EE:FF
+
+      - name: Test device list
+        run: ./bin/${{ matrix.bin }} device list
+
+      - name: Test device remove
+        run: ./bin/${{ matrix.bin }} device remove testdevice
+
+      - name: Start UDP listener and test wake (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          python3 -c "
+          import socket, sys
+          s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+          s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+          s.bind(('', 9))
+          s.settimeout(5)
+          try:
+              data, addr = s.recvfrom(1024)
+              if data[:6] == b'\xff\xff\xff\xff\xff\xff':
+                  print('Valid magic packet received')
+                  sys.exit(0)
+              else:
+                  print('Invalid packet structure:', data.hex())
+                  sys.exit(1)
+          except socket.timeout:
+              print('No packet received within timeout')
+              sys.exit(1)
+          " &
+          LISTENER_PID=$!
+          sleep 1
+          ./bin/${{ matrix.bin }} wake AA:BB:CC:DD:EE:FF -i 127.0.0.1
+          wait $LISTENER_PID
+
+      - name: Start UDP listener and test wake (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          $listener = Start-Job -ScriptBlock {
+            $udp = New-Object System.Net.Sockets.UdpClient(9)
+            $udp.Client.ReceiveTimeout = 5000
+            $ep = New-Object System.Net.IPEndPoint([System.Net.IPAddress]::Any, 0)
+            try {
+              $data = $udp.Receive([ref]$ep)
+              if ($data[0] -eq 0xFF -and $data[1] -eq 0xFF) {
+                Write-Output "Valid magic packet received"
+                exit 0
+              } else {
+                Write-Output "Invalid packet structure"
+                exit 1
+              }
+            } catch {
+              Write-Output "No packet received within timeout"
+              exit 1
+            }
+          }
+          Start-Sleep -Seconds 1
+          ./bin/${{ matrix.bin }} wake AA:BB:CC:DD:EE:FF -i 127.0.0.1
+          Receive-Job $listener -Wait -AutoRemoveJob

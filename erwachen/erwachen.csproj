@@ -23,4 +23,14 @@
         <EmbeddedResource Include="Assets\Terminus.flf" />
     </ItemGroup>
 
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <PublishTrimmed>true</PublishTrimmed>
+        <TrimMode>partial</TrimMode>
+        <PublishSingleFile>true</PublishSingleFile>
+        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
+        <StripSymbols>true</StripSymbols>
+        <InvariantGlobalization>true</InvariantGlobalization>
+    </PropertyGroup>
 </Project>
