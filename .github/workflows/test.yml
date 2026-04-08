@@ -49,13 +49,13 @@ jobs:
         run: ./bin/${{ matrix.bin }} --version
 
       - name: Test device add
-        run: ./bin/${{ matrix.bin }} device add testdevice AA:BB:CC:DD:EE:FF
+        run: ./bin/${{ matrix.bin }} add testdevice AA:BB:CC:DD:EE:FF
 
       - name: Test device list
-        run: ./bin/${{ matrix.bin }} device list
+        run: ./bin/${{ matrix.bin }} list
 
       - name: Test device remove
-        run: ./bin/${{ matrix.bin }} device remove testdevice
+        run: ./bin/${{ matrix.bin }} remove testdevice
 
       - name: Start UDP listener and test wake (Unix)
         if: runner.os != 'Windows'
