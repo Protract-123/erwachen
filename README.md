@@ -1,5 +1,7 @@
 # erwachen
 
+AI Disclaimer: I used claude code for making my code more readable by standardizing code formatting, punctuation, patterns, etc. I also used it for code refactoring and code review. The CI/CD was created by claude code and reviewed by me, and the figgle font was created by claude code from a broken figgle font file.  
+
 erwachen is a Wake-on-LAN CLI tool built with .NET 10. It supports registering devices so you can wake machines by name instead of remembering MAC addresses. It includes both a standard CLI and an interactive terminal interface. Inspired by [jpoliv's](https://github.com/jpoliv) [wakeonlan](https://github.com/jpoliv/wakeonlan).
 
 ## Installation
