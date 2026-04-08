@@ -106,4 +106,5 @@ jobs:
           }
           Start-Sleep -Seconds 1
           ./bin/${{ matrix.bin }} wake AA:BB:CC:DD:EE:FF -i 127.0.0.1 -p 9999
-          Receive-Job $listener -Wait -AutoRemoveJob
+          Receive-Job $listener -Wait
+          Remove-Job $listener
